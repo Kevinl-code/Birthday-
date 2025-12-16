@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GitHub JPG Gallery</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.card-buttons {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.card-buttons a {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.view {
+    background: #007bff;
+}
+
+.download {
+    background: #28a745;
+}
+</style>
+</head>
+
+<body>
+
+<h1>GitHub JPG Gallery</h1>
+<div class="gallery" id="gallery"></div>
+
+<script>
+const OWNER = "Kevinl-code";
+const REPO = "Birthday";
+const FOLDER = "Images"; // e.g. "images"
+
+const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`;
+const gallery = document.getElementById("gallery");
+
+fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+        data
+            .filter(file => file.type === "file" && file.name.toLowerCase().endsWith(".jpg"))
+            .forEach(file => {
+                const card = document.createElement("div");
+                card.className = "card";
+
+                card.innerHTML = `
+                    <img src="${file.download_url}" alt="${file.name}">
+                    <div class="card-buttons">
+                        <a href="${file.html_url}" target="_blank" class="view">View</a>
+                        <a href="${file.download_url}" download class="download">Download</a>
+                    </div>
+                `;
+
+                gallery.appendChild(card);
+            });
+    })
+    .catch(err => console.error("Error:", err));
+</script>
+
+</body>
+</html>
+
