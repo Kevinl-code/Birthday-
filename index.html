@@ -70,10 +70,24 @@ h1 {
 <script>
 const OWNER = "Kevinl-code";
 const REPO = "Birthday-";
-const FOLDER = "Images"; // e.g. "images"
+const FOLDER = "Images";
 
 const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`;
 const gallery = document.getElementById("gallery");
+
+function forceDownload(url, filename) {
+    fetch(url)
+        .then(res => res.blob())
+        .then(blob => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+        });
+}
 
 fetch(API_URL)
     .then(res => res.json())
@@ -88,9 +102,14 @@ fetch(API_URL)
                     <img src="${file.download_url}" alt="${file.name}">
                     <div class="card-buttons">
                         <a href="${file.html_url}" target="_blank" class="view">View</a>
-                        <a href="${file.download_url}" download class="download">Download</a>
+                        <a href="#" class="download">Download</a>
                     </div>
                 `;
+
+                card.querySelector(".download").addEventListener("click", e => {
+                    e.preventDefault();
+                    forceDownload(file.download_url, file.name);
+                });
 
                 gallery.appendChild(card);
             });
